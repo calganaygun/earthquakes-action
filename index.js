@@ -34,6 +34,7 @@ let evalRes = (res) => {
         writeEarthquakesToFile(networkEarthquakes);
         if (earthquakes.length === 0) {
             console.log('Earthquake not happened');
+            writeTweetToFile('');
             return;
         }
     })
