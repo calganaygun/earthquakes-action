@@ -1,4 +1,4 @@
-# Earthquakes Action
+# Earthquakes Action for Twitter
 
 Earthquakes Action is Github Action that sends SMS when specified earthquakes happened.
 
