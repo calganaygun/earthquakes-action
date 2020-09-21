@@ -1,4 +1,4 @@
-name: Daily
+name: EveryFive
 
 on:
   push:
@@ -26,17 +26,16 @@ jobs:
         yarn
         yarn start
       env:
-        CI: true
         CITIES_DELIMITED_WITH_SEMICOLON: ${{ secrets.CITIES_DELIMITED_WITH_SEMICOLON }}
         MIN_MAGNITUDE: ${{ secrets.MIN_MAGNITUDE }}
         IFTTT_WEBHOOKS_KEY: ${{ secrets.IFTTT_WEBHOOKS_KEY }}
         IFTTT_EVENT: ${{ secrets.IFTTT_EVENT }}
         HERE_API_KEY: ${{ secrets.HERE_API_KEY }}
-        - name: Upload files
-        uses: actions/upload-artifact@v2
-        with:
-          name: tweet
-          path: tweet.txt
+    - name: Upload files
+      uses: actions/upload-artifact@v2
+      with:
+        name: sms
+        path: sms.txt
     - run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
