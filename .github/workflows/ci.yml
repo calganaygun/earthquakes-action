@@ -27,17 +27,11 @@ jobs:
         yarn start
       env:
         CI: true
-        MSISDN_RECEIVERS_DELIMITED_WITH_SEMICOLON: ${{ secrets.MSISDN_RECEIVERS_DELIMITED_WITH_SEMICOLON }}
-        MSISDN_SENDER: ${{ secrets.MSISDN_SENDER }}
-        TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
-        TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
         CITIES_DELIMITED_WITH_SEMICOLON: ${{ secrets.CITIES_DELIMITED_WITH_SEMICOLON }}
         MIN_MAGNITUDE: ${{ secrets.MIN_MAGNITUDE }}
-    - name: Upload files
-      uses: actions/upload-artifact@v2
-      with:
-        name: sms
-        path: sms.txt
+        IFTTT_WEBHOOKS_KEY: ${{ secrets.IFTTT_WEBHOOKS_KEY }}
+        IFTTT_EVENT: ${{ secrets.IFTTT_EVENT }}
+        HERE_API_KEY: ${{ secrets.HERE_API_KEY }}
     - run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
