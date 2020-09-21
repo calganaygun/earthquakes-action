@@ -1,6 +1,6 @@
 # Earthquakes Action for Twitter
 
-Earthquakes Action is Github Action that sends SMS when specified earthquakes happened.
+Earthquakes Action is Github Action that posts tweet when specified earthquakes happened.
 
 ## Screenshot
 
@@ -8,24 +8,26 @@ Earthquakes Action is Github Action that sends SMS when specified earthquakes ha
 
 ## Requirements
 
-1. Twilio trial or upgraded account.
+1. IFTTT Account.
 2. Public or private Github repo.
 
 ## Usage
 
 1. Fork this repo.
-2. If you have trial twilio account, you should specify [verified gsm numbers](https://www.twilio.com/console/phone-numbers/verified) for sending sms.
-3. Go to your forked repo's "Settings" tab and navigate to "Secrets" from left sidebar.
-4. Create secrets according to your [twilio account](https://www.twilio.com/console) information:
+2. Create an IFTTT Applet: If webhooks triggered, send tweet with image.
+3. Tweet text should be Value2 variable and image URL should be Value1.
+4. Go to Here Developers and create a free developer account. Create a REST App.
+5. Go to your forked repo's "Settings" tab and navigate to "Secrets" from left sidebar.
+6. Create secrets according to your IFTTT and Here Developer acoounts:
 
 ```bash
-MSISDN_RECEIVERS_DELIMITED_WITH_SEMICOLON=+905311234567;+905531234567
-MSISDN_SENDER=+10987654321
-TWILIO_ACCOUNT_SID=AC123456ytfd3123456ytre12345612345
-TWILIO_AUTH_TOKEN=7f123456ab56331cd245412312312356
+IFTTT_WEBHOOKS_KEY=bjGgV5Ks8YuF8MTH5ZRQez # You can get this key from Webhooks service settings
+IFTTT_EVENT=new_erthquake # Event name which used in your IFTTT Applet
+# Map
+HERE_API_KEY=ggcK_EbdlrIMyb7RgJhI_yOeZ5wk88aKAOm2uQSuX7o # Here Map API Key
 # Criteria parameters
 CITIES_DELIMITED_WITH_SEMICOLON=BINGOL;BALIKESIR # Or * character for all cities
-MIN_MAGNITUDE=4.0
+MIN_MAGNITUDE=3.5
 # for debugging purposes
 ACTIONS_STEP_DEBUG=true
 ```
