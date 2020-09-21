@@ -107,7 +107,7 @@ let createTweetText = (earthquake) => {
     if (date.includes(' ')) {
         date = date.split(' ')[1];
     }
-    return `💢 ${earthquake.location}'de #deprem Büyüklük: ${earthquake.mag} Zaman: ${date} #deprem`;
+    return `💢 ${earthquake.location}'de #deprem Büyüklük: ${earthquake.mag} Zaman: ${date}`;
 }
 
 let writeTweetToFile = (tweet) => {
