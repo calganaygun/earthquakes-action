@@ -107,12 +107,19 @@ let createTweetText = (earthquake) => {
     if (date.includes(' ')) {
         date = date.split(' ')[1];
     }
-    return `💢 ${earthquake.mag} ${date} ${earthquake.location} #deprem`;
+    return `💢 ${earthquake.location}'de #deprem Büyüklük: ${earthquake.mag} Zaman: ${date} #deprem`;
+}
+
+let writeTweetToFile = (tweet) => {
+    fs.writeFile('tweet.txt', tweet, function(err) {
+        if (err) return console.log(err);
+        console.log('Written tweet.txt');
+    });
 }
 
 let generateImageUrl = (earthquake) => {
     const apiKey = process.env.HERE_API_KEY;
-    const url = `https://image.maps.ls.hereapi.com/mia/1.6/mapview?apiKey=${apiKey}&f=1&lat=${earthquake.lat}&lon=${earthquake.lng}&h=675&w=1200&ml=tur&ml2=eng&z=8.2`;
+    const url = `https://image.maps.ls.hereapi.com/mia/1.6/mapview?apiKey=${apiKey}&f=1&lat=${earthquake.lat}&lon=${earthquake.lng}&h=1150&w=2048&ml=tur&ml2=eng&z=8.2`;
     return url
 }
 
@@ -131,4 +138,5 @@ let sendTweet = (tweetText, imageUrl) => {
     })
     .then(response => console.log('Sent', response.text))
     .catch(error => console.log('Sending error', error));
+    writeTweetToFile(tweetText)
 }

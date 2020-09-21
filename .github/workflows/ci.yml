@@ -32,6 +32,11 @@ jobs:
         IFTTT_WEBHOOKS_KEY: ${{ secrets.IFTTT_WEBHOOKS_KEY }}
         IFTTT_EVENT: ${{ secrets.IFTTT_EVENT }}
         HERE_API_KEY: ${{ secrets.HERE_API_KEY }}
+        - name: Upload files
+        uses: actions/upload-artifact@v2
+        with:
+          name: tweet
+          path: tweet.txt
     - run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
