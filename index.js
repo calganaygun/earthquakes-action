@@ -1,12 +1,9 @@
 const cheerio = require('cheerio');
 const fetch = require('node-fetch');
-const twilio = require('twilio');
 const fs = require('fs');
 require('dotenv').config();
 
 const emptyChar = '⠀';
-
-const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 fetch("http://udim.koeri.boun.edu.tr/zeqmap/xmlt/son24saat.xml")
     .then(res => res.text())
@@ -15,8 +12,8 @@ fetch("http://udim.koeri.boun.edu.tr/zeqmap/xmlt/son24saat.xml")
 
 
 let comparer = (otherArray) => {
-    return function(current) {
-        return otherArray.filter(function(other) {
+    return function (current) {
+        return otherArray.filter(function (other) {
             return other.date === current.date
         }).length == 0;
     }
@@ -28,20 +25,18 @@ let evalRes = (res) => {
     const earthquakesDOM = getEarthquakesDOM($);
     const networkEarthquakes = createEarthquakesArray($, earthquakesDOM);
     readLocalFileEarthquakes().then(strLocalEarthquakes => {
-            const localEarthquakes = JSON.parse(strLocalEarthquakes);
-            const newEarthquakes = networkEarthquakes.filter(comparer(localEarthquakes));
-            console.log('newEarthquakes', newEarthquakes);
-            const earthquakes = getEarthquakesBySelectedCriteria(newEarthquakes);
-            console.log('earthquakes', earthquakes);
-            const smsText = createSmsText(earthquakes);
-            writeEarthquakesToFile(networkEarthquakes);
-            if (smsText.length === 0) {
-                console.log('Earthquake not happened');
-                return;
-            }
-            writeSmsToFile(smsText);
-            sendSmsToRecievers(smsText);
-        })
+        const localEarthquakes = JSON.parse(strLocalEarthquakes);
+        const newEarthquakes = networkEarthquakes.filter(comparer(localEarthquakes));
+        console.log('newEarthquakes', newEarthquakes);
+        const earthquakes = getEarthquakesBySelectedCriteria(newEarthquakes);
+        console.log('earthquakes', earthquakes);
+        sendNewEarthQuakesTweets(earthquakes);
+        writeEarthquakesToFile(networkEarthquakes);
+        if (earthquakes.length === 0) {
+            console.log('Earthquake not happened');
+            return;
+        }
+    })
         .catch(err => console.log(err));
 }
 
@@ -68,7 +63,7 @@ let createEarthQuakeObj = ($, earthquake) => {
 }
 
 let writeEarthquakesToFile = (earthquakes) => {
-    fs.writeFile('previousEarthquakes.json', JSON.stringify(earthquakes), function(err) {
+    fs.writeFile('previousEarthquakes.json', JSON.stringify(earthquakes), function (err) {
         if (err) return console.log(err);
         console.log('Written earthquakes.json');
     });
@@ -100,42 +95,40 @@ const getEarthquakesBySelectedCriteria = newEarthquakes => {
     return foundEarthquakes;
 }
 
-let createSmsText = (earthquakes) => {
-    let smsTextArray = [];
+let sendNewEarthQuakesTweets = (earthquakes) => {
     earthquakes.forEach(earthquake => {
-        smsTextArray.push(createSmsLine(earthquake));
+        sendTweet(createTweetText(earthquake),
+        generateImageUrl(earthquake));
     });
-    if (smsTextArray.length === 0) return "";
-    return `${emptyChar}\n${emptyChar}\n${smsTextArray.join('\n')}\n${emptyChar}\n${emptyChar}`;
 }
 
-
-let createSmsLine = (earthquake) => {
+let createTweetText = (earthquake) => {
     let date = earthquake.date;
     if (date.includes(' ')) {
         date = date.split(' ')[1];
     }
-    return `💢 ${earthquake.mag} ${date} ${earthquake.location}`;
+    return `💢 ${earthquake.mag} ${date} ${earthquake.location} #deprem`;
 }
 
-
-let writeSmsToFile = (sms) => {
-    fs.writeFile('sms.txt', sms, function(err) {
-        if (err) return console.log(err);
-        console.log('Written sms.txt');
-    });
+let generateImageUrl = (earthquake) => {
+    const apiKey = process.env.HERE_API_KEY;
+    const url = `https://image.maps.ls.hereapi.com/mia/1.6/mapview?apiKey=${apiKey}&f=1&lat=${earthquake.lat}&lon=${earthquake.lng}&h=675&w=1200&ml=tur&ml2=eng&z=8.2`;
+    return url
 }
 
-let sendSmsToRecievers = (smsText) => {
-    const receivers = process.env.MSISDN_RECEIVERS_DELIMITED_WITH_SEMICOLON;
-    receivers.split(';').forEach(receiver => {
-        client.messages.create({
-                to: receiver,
-                from: process.env.MSISDN_SENDER,
-                body: smsText
+let sendTweet = (tweetText, imageUrl) => {
+    const webhookKey = process.env.IFTTT_WEBHOOKS_KEY;
+    const iftttEventName = process.env.IFTTT_EVENT;
+    fetch(`https://maker.ifttt.com/trigger/${iftttEventName}/with/key/${webhookKey}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(
+            {   "value1" : imageUrl,
+                "value2" : tweetText
             })
-            .then(message => console.log('Sent', 'SID', message.sid))
-            .catch(error => console.log('Sending error', error));
-    });
-
+    })
+    .then(response => console.log('Sent', response.text))
+    .catch(error => console.log('Sending error', error));
 }
